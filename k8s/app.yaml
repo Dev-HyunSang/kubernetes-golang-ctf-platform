@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ctf-app
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30001
+  selector:
+    app: ctf-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctf-app
+spec:
+  selector:
+    matchLabels:
+      app: ctf-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ctf-app
+    spec:
+      containers:
+      - name: ctf-app
+        image: ctf-app:latest
+        imagePullPolicy: Never # Use local Minikube image
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_HOST
+          value: "postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "password"
+        - name: DB_NAME
+          value: "ctf"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: JWT_SECRET
+          value: "minikube_secret_key"
